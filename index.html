@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lore Archive // Oqhoi fȳr (Ozai)</title>
+    <style>
+        :root {
+            --bg-color: #0b0d13;
+            --code-bg: #11141f;
+            --text-color: #d1d5db;
+            --accent-orange: #ff6b35;
+            --accent-gold: #f7b801;
+            --accent-cyan: #4cc9f0;
+            --accent-purple: #b5179e;
+            --comment-color: #5c677d;
+            --keyword-color: #ff0055;
+            --string-color: #06d6a0;
+            --function-color: #7209b7;
+            --border-color: #2b3042;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ide-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* IDE Header Bar */
+        .ide-header {
+            background: #090b10;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .ide-title {
+            color: var(--comment-color);
+            font-size: 0.85rem;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            display: flex;
+            background: #0d0f17;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            color: var(--comment-color);
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            background: var(--code-bg);
+            color: var(--accent-orange);
+            border-top: 2px solid var(--accent-orange);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.02);
+            color: var(--text-color);
+        }
+
+        /* Editor Area */
+        .editor-area {
+            padding: 20px;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Code Syntax Highlighting */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+        }
+
+        .comment { color: var(--comment-color); font-style: italic; }
+        .keyword { color: var(--keyword-color); font-weight: bold; }
+        .string { color: var(--string-color); }
+        .function { color: var(--accent-cyan); }
+        .number { color: var(--accent-gold); }
+        .type { color: var(--accent-purple); }
+        .highlight { background: rgba(255, 107, 53, 0.15); padding: 2px 4px; border-radius: 4px; color: var(--accent-orange); }
+
+        /* Foldable Section Styling */
+        details {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--accent-gold);
+            outline: none;
+            user-select: none;
+        }
+
+        summary:hover {
+            color: var(--accent-orange);
+        }
+
+        /* Floating Actions */
+        .copy-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--border-color);
+            color: var(--text-color);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-orange);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ide-container">
+    <!-- Window Header -->
+    <div class="ide-header">
+        <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+        </div>
+        <div class="ide-title">SimTeLenna_Archives // FireSaint_Full_Story.ts</div>
+        <div style="font-size: 0.75rem; color: var(--accent-gold);">[READ-ONLY]</div>
+    </div>
+
+    <!-- Tab Bar Navigation -->
+    <div class="tab-bar">
+        <button class="tab active" onclick="switchTab('cosmology')">🌌 Cosmology.ts</button>
+        <button class="tab" onclick="switchTab('ozai')">🔥 FireSaint_Profile.ts</button>
+        <button class="tab" onclick="switchTab('lore')">📜 Great_War_Lore.ts</button>
+        <button class="tab" onclick="switchTab('flames')">⚡ Flames_And_Overload.ts</button>
+        <button class="tab" onclick="switchTab('nyra')">❄️ Empress_Nyra.ts</button>
+    </div>
+
+    <!-- Editor Body -->
+    <div class="editor-area">
+        <button class="copy-btn" onclick="copyCurrentTab()">📋 Copy Tab Code</button>
+
+        <!-- TAB 1: COSMOLOGY -->
+        <div id="cosmology" class="tab-content active">
+<pre><code><span class="comment">/**
+ * COSMOLOGICAL ARCHITECTURE OF REALITY
+ * Authority: T.C.O.A.C (The Creator Of All Creator)
+ */</span>
+
+<span class="keyword">namespace</span> <span class="type">OriginRealm</span> {
+
+    <span class="keyword">export const</span> <span class="function">T_C_O_A_C</span> = {
+        title: <span class="string">"The Creator Of All Creator"</span>,
+        nature: <span class="string">"The beginning of all beginnings and the end of all ends"</span>,
+        domain: <span class="string">"Origin Realm"</span>,
+        rule: <span class="string">"Claiming to be above Him is a structural impossibility and a sin."</span>
+    };
+
+    <span class="keyword">export enum</span> <span class="type">ExistentialLayers</span> {
+        <span class="comment">// Level 00: Unending realm of higher beings</span>
+        <span class="highlight">SIM_TE_LENNA</span> = <span class="number">0</span>,
+
+        <span class="comment">// Level 01: Realm directly governed by rules set by T.C.O.A.C</span>
+        <span class="highlight">REALM_OF_THE_WRITERS</span> = <span class="number">1</span>,
+
+        <span class="comment">// Level 02: Where concepts fail and metaphysical scales end</span>
+        <span class="highlight">OUTSIDE_EXISTENCE</span> = <span class="number">2</span>,
+
+        <span class="comment">// Level 03: Mega collection of all universes, multiverses, and hyperverses</span>
+        <span class="highlight">OMNIVERSE</span> = <span class="number">3</span>
+    }
+}
+</code></pre>
+        </div>
+
+        <!-- TAB 2: OZAI PROFILE -->
+        <div id="ozai" class="tab-content">
+<pre><code><span class="comment">/**
+ * ENTITY SPECIFICATION: OQHOI FȲR
+ */</span>
+
+<span class="keyword">interface</span> <span class="type">HigherBeing</span> {
+    trueName: <span class="type">string</span>;
+    alias: <span class="type">string</span>;
+    classTier: <span class="type">string</span>;
+    affinity: <span class="type">string</span>;
+    status: <span class="type">string</span>;
+}
+
+<span class="keyword">export const</span> <span class="function">Ozai</span>: <span class="type">HigherBeing</span> = {
+    trueName: <span class="string">"Oqhoi fȳr"</span>, <span class="comment">// Meaning: Mysterious Fire</span>
+    alias: <span class="string">"The Fire Saint / Protector of All"</span>,
+    classTier: <span class="string">"Lowest Class (Formerly bullied by higher tier angels)"</span>,
+    affinity: <span class="string">"Primal Fire"</span>,
+    status: <span class="string">"Active Wanderer"</span>
+};
+
+<span class="keyword">class</span> <span class="type">OzaiCharacteristics</span> {
+    public height = <span class="string">"5'5\""</span>;
+    public appearance = <span class="string">"Shaggy white hair, blue eyes, white lotus pendant, gray robe with flame motifs"</span>;
+    public favoriteFood = <span class="string">"Honeycomb"</span>;
+    public mindset = <span class="string">"Never arrogant, pure, childish, and seeking peace over power"</span>;
+}
+</code></pre>
+        </div>
+
+        <!-- TAB 3: LORE -->
+        <div id="lore" class="tab-content">
+<pre><code><span class="comment">// CHRONOLOGY OF THE GREAT WAR & THE FIRST FLAME</span>
+
+<details open>
+<summary>01_OriginSpace_Emergence.ts</summary>
+<p class="comment">In the absence of everything and nothingness, T.C.O.A.C emerged.
+The clash of His emergence created a heat so immense it took form as the Chaos Flame (The First Flame).</p>
+</details>
+
+<details>
+<summary>02_The_Great_War_And_Seven_Sins.ts</summary>
+<p class="comment">The Seven Deadly Sins arose, envying T.C.O.A.C's love for mortal beings.
+Ozai joined the army of True Heaven as a lowest-class soldier and fought across everlasting eons.</p>
+</details>
+
+<details>
+<summary>03_Recieving_The_Flames.ts</summary>
+<p class="comment">T.C.O.A.C brought Ozai to the Origin Space to grant him the Creation Flame.
+Recognizing pure innocence, the Chaos Flame also bonded directly to Ozai's chest.
+T.C.O.A.C officially named him: THE FIRE SAINT.</p>
+</details>
+
+<details>
+<summary>04_Defeat_Of_The_Seven_Sins.ts</summary>
+<span class="keyword">function</span> <span class="function">sealTheEvils</span>() {
+    <span class="comment">// Ozai created True Hell inside his left pupil using the Chaos Flame</span>
+    <span class="keyword">return</span> <span class="string">"All Seven Deadly Sins trapped inside Ozai's left eye realm."</span>;
+}
+</details>
+</code></pre>
+        </div>
+
+        <!-- TAB 4: FLAMES & OVERLOAD -->
+        <div id="flames" class="tab-content">
+<pre><code><span class="comment">/**
+ * TECHNIQUES & THE ULTIMATE OVERLOAD
+ */</span>
+
+<span class="keyword">export async function</span> <span class="function">executeHeatOverload</span>() {
+    <span class="comment">// 1. Intangible Flame Form Activated</span>
+    <span class="keyword">let</span> ozaiForm = <span class="string">"Intangible Chaos Flame"</span>;
+    
+    <span class="comment">// 2. Execution duration: Fraction of a millisecond</span>
+    <span class="keyword">let</span> duration = <span class="number">0.0001</span>; <span class="comment">// milliseconds</span>
+    
+    <span class="comment">// 3. Result</span>
+    <span class="keyword">console</span>.log(<span class="string">"Origin Space erased permanently where nothingness was absent."</span>);
+    <span class="keyword">console</span>.log(<span class="string">"Heat reached the hem of T.C.O.A.C's robe and burned it."</span>);
+    
+    <span class="comment">// 4. Interruption</span>
+    <span class="type">T_C_O_A_C</span>.shutDownTechnique();
+    <span class="keyword">return</span> <span class="string">"Ozai exhausted. Instructed NEVER to use Heat Overload again."</span>;
+}
+
+<span class="comment">/**
+ * POST-WAR DECISION
+ */</span>
+<span class="keyword">const</span> <span class="function">oqhoiFyrTheGreat</span> = () => {
+    <span class="comment">// Ozai returned both Creation and Chaos flames back to T.C.O.A.C</span>
+    <span class="keyword">return</span> <span class="string">"It's nice to be powerful, but peace is better. He regained his freedom to roam EVERYWHERE and EVERYWHEN."</span>;
+};
+</code></pre>
+        </div>
+
+        <!-- TAB 5: EMPRESS NYRA -->
+        <div id="nyra" class="tab-content">
+<pre><code><span class="comment">/**
+ * THE INCIDENT AT THE AUSPICIOUS HALL
+ */</span>
+
+<span class="keyword">const</span> <span class="function">NyraSolwein</span> = {
+    title: <span class="string">"Empress of the Nine Heavens"</span>,
+    aura: <span class="string">"Purple gaze capable of turning floors to solid ice"</span>,
+    
+    encounterWithOzai: <span class="keyword">function</span>() {
+        <span class="comment">// Accused of treason, Ozai walked up to her throne...</span>
+        <span class="keyword">this</span>.slapFace();
+        <span class="keyword">this</span>.kissDirectly();
+        <span class="function">escapeSpeed</span>.hopOutside();
+        
+        <span class="keyword">return</span> <span class="string">"Nyra shouted: 'FIND THAT MOTHER FUCKIN BASTARD!!!!!!'"</span>;
+    },
+
+    secretStatus: <span class="string">"Searches for him endlessly. Faintly smiles whenever she catches sight of him roaming the lower realms."</span>
+};
+</code></pre>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function switchTab(tabId) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show selected tab
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function copyCurrentTab() {
+        const activeTab = document.querySelector('.tab-content.active pre').innerText;
+        navigator.clipboard.writeText(activeTab).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.innerText = "✅ Copied!";
+            setTimeout(() => btn.innerText = "📋 Copy Tab Code", 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
+
