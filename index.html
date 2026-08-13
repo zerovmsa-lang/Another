@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Replica</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #2a2a2a;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+  }
+
+  .scene {
+    position: relative;
+    width: 380px;
+    height: 520px;
+    background: #c9c4be;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+
+  /* Wall texture */
+  .scene::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 30%, #d4cfc8 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, #b8b2ab 0%, transparent 35%);
+    opacity: 0.6;
+  }
+
+  /* Door frame left */
+  .door {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 38px;
+    height: 100%;
+    background: #8a8078;
+    border-right: 3px solid #6b635c;
+  }
+
+  /* Hair (long black) */
+  .hair-back {
+    position: absolute;
+    top: 55px;
+    left: 85px;
+    width: 210px;
+    height: 340px;
+    background: #0d0d0d;
+    border-radius: 110px 110px 40px 40px;
+    z-index: 1;
+  }
+
+  .hair-side-left {
+    position: absolute;
+    top: 95px;
+    left: 70px;
+    width: 55px;
+    height: 280px;
+    background: #0d0d0d;
+    border-radius: 30px;
+    transform: rotate(8deg);
+    z-index: 2;
+  }
+
+  .hair-side-right {
+    position: absolute;
+    top: 90px;
+    right: 75px;
+    width: 60px;
+    height: 300px;
+    background: #111;
+    border-radius: 30px;
+    transform: rotate(-6deg);
+    z-index: 2;
+  }
+
+  /* Face */
+  .face {
+    position: absolute;
+    top: 95px;
+    left: 135px;
+    width: 115px;
+    height: 145px;
+    background: #f2d5c2;
+    border-radius: 55% 55% 50% 50%;
+    z-index: 3;
+    box-shadow: inset -8px -5px 12px rgba(0,0,0,0.08);
+  }
+
+  /* Eyes */
+  .eye {
+    position: absolute;
+    width: 18px;
+    height: 9px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    top: 58px;
+  }
+  .eye.left { left: 28px; }
+  .eye.right { right: 28px; }
+
+  /* Nose */
+  .nose {
+    position: absolute;
+    top: 72px;
+    left: 52px;
+    width: 10px;
+    height: 14px;
+    border-radius: 50%;
+    background: #e8c4b0;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.1);
+  }
+
+  /* Mouth */
+  .mouth {
+    position: absolute;
+    top: 98px;
+    left: 42px;
+    width: 32px;
+    height: 12px;
+    border-radius: 0 0 20px 20px;
+    background: #c97b7b;
+    box-shadow: inset 0 3px 4px rgba(0,0,0,0.15);
+  }
+
+  /* Eyebrows */
+  .brow {
+    position: absolute;
+    width: 26px;
+    height: 4px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    top: 46px;
+  }
+  .brow.left { left: 24px; transform: rotate(-8deg); }
+  .brow.right { right: 24px; transform: rotate(8deg); }
+
+  /* Neck */
+  .neck {
+    position: absolute;
+    top: 225px;
+    left: 165px;
+    width: 50px;
+    height: 45px;
+    background: #f2d5c2;
+    z-index: 2;
+  }
+
+  /* Body / Top */
+  .body {
+    position: absolute;
+    top: 255px;
+    left: 95px;
+    width: 190px;
+    height: 230px;
+    background: #111;
+    border-radius: 20px 20px 0 0;
+    z-index: 2;
+  }
+
+  /* Lace pattern approximation */
+  .body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 6px,
+        rgba(80,80,80,0.4) 6px,
+        rgba(80,80,80,0.4) 8px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 6px,
+        rgba(60,60,60,0.3) 6px,
+        rgba(60,60,60,0.3) 8px
+      );
+    border-radius: inherit;
+    opacity: 0.7;
+  }
+
+  /* Sheer effect */
+  .body::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent 40%);
+    border-radius: inherit;
+  }
+
+  /* Arm holding glasses */
+  .arm {
+    position: absolute;
+    top: 250px;
+    left: 70px;
+    width: 55px;
+    height: 140px;
+    background: #f2d5c2;
+    border-radius: 30px;
+    transform: rotate(25deg);
+    z-index: 4;
+    transform-origin: top center;
+  }
+
+  /* Hand */
+  .hand {
+    position: absolute;
+    top: 360px;
+    left: 55px;
+    width: 45px;
+    height: 35px;
+    background: #f2d5c2;
+    border-radius: 40% 40% 50% 50%;
+    z-index: 5;
+    transform: rotate(-10deg);
+  }
+
+  /* Glasses */
+  .glasses {
+    position: absolute;
+    top: 175px;
+    left: 95px;
+    width: 70px;
+    height: 28px;
+    border: 3px solid #222;
+    border-radius: 8px;
+    z-index: 6;
+    transform: rotate(-15deg);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .glasses::before {
+    content: "";
+    position: absolute;
+    left: 32px;
+    top: 10px;
+    width: 6px;
+    height: 3px;
+    background: #222;
+  }
+
+  /* Pearl bracelet */
+  .bracelet {
+    position: absolute;
+    top: 355px;
+    left: 68px;
+    width: 28px;
+    height: 10px;
+    border: 3px solid #f0e6d8;
+    border-radius: 20px;
+    z-index: 5;
+    box-shadow: 0 0 0 1px #ddd;
+  }
+
+  /* Crossbody strap */
+  .strap {
+    position: absolute;
+    top: 260px;
+    left: 140px;
+    width: 8px;
+    height: 180px;
+    background: #1a1a1a;
+    transform: rotate(18deg);
+    z-index: 3;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="door"></div>
+    <div class="hair-back"></div>
+    <div class="hair-side-left"></div>
+    <div class="hair-side-right"></div>
+    <div class="face">
+      <div class="brow left"></div>
+      <div class="brow right"></div>
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="nose"></div>
+      <div class="mouth"></div>
+    </div>
+    <div class="neck"></div>
+    <div class="body"></div>
+    <div class="strap"></div>
+    <div class="arm"></div>
+    <div class="hand"></div>
+    <div class="glasses"></div>
+    <div class="bracelet"></div>
+  </div>
+</body>
+      </html>
